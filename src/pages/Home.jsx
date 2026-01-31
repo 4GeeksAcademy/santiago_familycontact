@@ -1,58 +1,52 @@
-
-// Import React and necessary hooks
 import React, { useState, useEffect } from "react";
-// useNavigate is used to programmatically navigate between routes
 import { useNavigate } from "react-router-dom";
-// Custom hook for accessing global state and dispatch actions
 import useGlobalReducer from "../hooks/useGlobalReducer";
-// Main component
+
 export const Home = () => {
-  const { store, dispatch } = useGlobalReducer(); // Access global state and dispatch
-  const navigate = useNavigate(); // Initialize navigation hook
-  // Controls whether delete confirmation modal is visible
+  const { store, dispatch } = useGlobalReducer();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-  // Stores the ID of the contact selected for deletion
   const [selectedContactId, setSelectedContactId] = useState(null);
-  // Fetch contacts when component mounts
+
   useEffect(() => {
     getContacts();
   }, []);
-  // Creates an empty contact list if not already present on the API
+
   const createContactList = async () => {
     await fetch("https://playground.4geeks.com/contact/agendas/lsantiago3", {
-      method: "POST", // Create a new list
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
     });
   };
-  // Fetch all contacts from the API
+
   const getContacts = async () => {
     let response = await fetch(
       "https://playground.4geeks.com/contact/agendas/lsantiago3/contacts"
     );
     if (!response.ok) {
-      createContactList(); // If no list exists, create it
+      createContactList();
     } else if (response.ok) {
-      let data = await response.json(); // Parse response
+      let data = await response.json();
       dispatch({
-        type: "load_data", // Action to load contacts into global store
+        type: "load_data",
         contacts: data.contacts,
       });
     }
   };
-  // Trigger delete confirmation modal
+
   const handleDelete = (id) => {
-    setSelectedContactId(id); // Set which contact will be deleted
-    setShowModal(true); // Show modal
+    setSelectedContactId(id);
+    setShowModal(true);
   };
-  // Confirm and delete contact from API
+
   const confirmDelete = async () => {
     try {
       const response = await fetch(
         `https://playground.4geeks.com/contact/agendas/lsantiago3/contacts/${selectedContactId}`,
         {
-          method: 'DELETE', // Remove contact
+          method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -60,10 +54,10 @@ export const Home = () => {
       );
       if (response.ok) {
         dispatch({
-          type: "delete_task", // Update global state
-          payload: selectedContactId,
+          type: "delete_contact",
+          payload: { id: selectedContactId },
         });
-        setShowModal(false); // Close modal
+        setShowModal(false);
       } else {
         console.error('Failed to delete contact');
       }
@@ -73,17 +67,16 @@ export const Home = () => {
   };
   return (
     <div className="container mt-4">
-      {/* Contact list */}
       <ul className="list-group">
         {store.contacts.map((item) => (
           <li
-            key={item.id} // Unique identifier
+            key={item.id}
             className="list-group-item d-flex justify-content-between align-items-center mb-3"
           >
             {/* Left section: Image + contact info */}
             <div className="d-flex align-items-center">
               <img
-                src="https://placedog.net/300" // Placeholder image
+                src="https://placedog.net/300"
                 alt="Profile"
                 style={{
                   width: "70px",
@@ -105,19 +98,18 @@ export const Home = () => {
                 </p>
               </div>
             </div>
-            {/* Right section: Action buttons */}
             <div className="d-flex">
               <button
                 className="btn btn-warning btn-sm me-2"
                 onClick={() => {
-                  navigate(`/editcontact/${item.id}`); // Navigate to edit page
+                  navigate(`/editcontact/${item.id}`);
                 }}
               >
                 <i className="fas fa-pencil-alt"></i>
               </button>
               <button
                 className="btn btn-danger btn-sm"
-                onClick={() => handleDelete(item.id)} // Open delete confirmation
+                onClick={() => handleDelete(item.id)}
               >
                 <i className="fas fa-trash"></i>
               </button>
@@ -125,7 +117,6 @@ export const Home = () => {
           </li>
         ))}
       </ul>
-      {/* Delete Confirmation Modal */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -137,10 +128,9 @@ export const Home = () => {
             <button onClick={() => setShowModal(false)} className="btn btn-secondary">
               Cancel
             </button>
-          </div>
+            </div>
         </div>
       )}
-      {/* Inline styles for modal */}
       <style jsx>{`
         .modal-overlay {
           position: fixed;
@@ -148,7 +138,7 @@ export const Home = () => {
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.5); /* Dark semi-transparent background */
+          background: rgba(0, 0, 0, 0.5);
           display: flex;
           justify-content: center;
           align-items: center;

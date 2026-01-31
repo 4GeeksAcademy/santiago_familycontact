@@ -1,8 +1,11 @@
 import react, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 const EditContact = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { dispatch } = useGlobalReducer();
 
   const [contact, setContact] = useState({
     name: "",
@@ -34,9 +37,9 @@ const EditContact = () => {
     setContact({...contact,[name]: value});
   }; 
   const handleSubmit = async (event) =>{
-    event.PreventDefault();
+    event.preventDefault();
     try {
-      const response = await fetch(`https://playground.4geeks.com/contact/agendas/gaboozc/contacts/${id}`, {
+      const response = await fetch(`https://playground.4geeks.com/contact/agendas/lsantiago3/contacts/${id}`, {
         method: 'PUT', 
         headers: {
           'Content-Type': 'application/json', 
@@ -47,6 +50,11 @@ const EditContact = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Contact updated successfully:', data);
+        dispatch({
+          type: "edit_contact",
+          payload: data,
+        });
+        navigate('/'); // Navigate back to home after successful update
       } else {
         console.error('Failed to update contact'); 
       }
@@ -54,7 +62,7 @@ const EditContact = () => {
       console.error('Error updating contact:', error);
     }
   };
-  // Inline styles for the container
+
   const elementStyle = {
     backgroundColor: '#ffffff',
     border: '2px solid #000000',
@@ -65,7 +73,6 @@ const EditContact = () => {
     margin: 'auto'
   };
 
-  // Style for the title
   const h1Style = {
     fontSize: '24px',
     fontFamily: 'Arial, sans-serif',
@@ -74,14 +81,12 @@ const EditContact = () => {
     marginBottom: '20px'
   };
 
-  // Style for form labels
   const labelStyle = {
     display: 'block',
     marginBottom: '8px',
     fontWeight: 'bold'
   };
 
-  // Style for inputs
   const inputStyle = {
     width: '100%',
     padding: '10px',
@@ -90,7 +95,6 @@ const EditContact = () => {
     borderRadius: '5px'
   };
 
-  // Style for submit button
   const buttonStyle = {
     width: '100%',
     padding: '10px',
@@ -102,7 +106,6 @@ const EditContact = () => {
     fontWeight: 'bold'
   };
 
-  // Style for the bottom link
   const linkStyle = {
     display: 'block',
     textAlign: 'center',
@@ -111,26 +114,22 @@ const EditContact = () => {
     textDecoration: 'none'
   };
 
-  // JSX returned by the component
   return (
     <div style={elementStyle}>
-      <h1 style={h1Style}>Edit Contact</h1> {/* Page title */}
-      <form onSubmit={handleSubmit}> {/* Form submission handler */}
-        
-        {/* Full Name Field */}
+      <h1 style={h1Style}>Edit Contact</h1>
+      <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>Full Name</label>
           <input
             type="text"
             name="name"
-            value={contact.name} // Bind input to state
+            value={contact.name}
             placeholder="Enter full name"
-            onChange={handleInputChange} // Update on change
+            onChange={handleInputChange}
             style={inputStyle}
           />
         </div>
 
-        {/* Email Field */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>Email</label>
           <input
@@ -143,7 +142,6 @@ const EditContact = () => {
           />
         </div>
 
-        {/* Phone Field */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>Phone</label>
           <input
@@ -155,8 +153,6 @@ const EditContact = () => {
             style={inputStyle}
           />
         </div>
-
-        {/* Address Field */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>Address</label>
           <input
@@ -169,17 +165,12 @@ const EditContact = () => {
           />
         </div>
 
-        {/* Submit Button */}
         <button type="submit" style={buttonStyle}>Save</button>
       </form>
 
-      {/* Navigation link (no real routing here yet) */}
       <a href="#" style={linkStyle}>or get back to contacts</a>
     </div>
   );
 };
 
-// Export component for usage in other files
 export default EditContact;
-
- 

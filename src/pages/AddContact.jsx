@@ -1,10 +1,11 @@
-// Import React and the useState hook from the 'react' library
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useGlobalReducer from '../hooks/useGlobalReducer';
 
-// Define the AddContact functional component
 const AddContact = () => {
+  const navigate = useNavigate();
+  const { dispatch } = useGlobalReducer();
 
-  // Initialize state for the contact form fields
   const [contact, setContact] = useState({
     name: '',
     email: '',
@@ -12,40 +13,43 @@ const AddContact = () => {
     address: ''
   });
 
-  // Handle input changes for all fields dynamically
   const handleInputChange = (event) => {
-    const { name, value } = event.target;             // Get the input's name and value
-    setContact({ ...contact, [name]: value });        // Update only the changed field
+    const { name, value } = event.target;
+    setContact({ ...contact, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (event) => {
-    event.preventDefault();                           // Prevent page reload on submit
-    console.log('Contact to be created:', contact);   // Log the current form data
+    event.preventDefault();
+    console.log('Contact to be created:', contact);
 
     try {
-      // Make a POST request to the API
       const response = await fetch('https://playground.4geeks.com/contact/agendas/lsantiago3/contacts', {
-        method: 'POST',                               // HTTP method
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json',         // Specify JSON format
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(contact),                 // Convert contact object to JSON
+        body: JSON.stringify(contact),
       });
 
-      console.log('Response status:', response.status); // Log response status code
+      console.log('Response status:', response.status);
 
-      if (response.ok) {                               // If request succeeded
-        const data = await response.json();            // Parse JSON response
-        console.log('Contact created successfully:', data); // Log success
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Contact created successfully:', data);
+        dispatch({
+          type: 'add_contact',
+          payload: data,
+        });
+        navigate('/', { replace: true });
+        return;
       } else {
-        console.error('Failed to create contact');      // Log failure
+        console.error('Failed to create contact');
       }
     } catch (error) {
-      console.error('Error creating contact:', error);  // Log network error
+      console.error('Error creating contact:', error);
     }
   };
-  // Define inline styles for the main container
+  
   const elementStyle = {
     backgroundColor: '#ffffff',
     border: '2px solid #000000',
@@ -56,7 +60,6 @@ const AddContact = () => {
     margin: 'auto'
   };
 
-  // Define styles for the title
   const h1Style = {
     fontSize: '24px',
     fontFamily: 'Arial, sans-serif',
@@ -65,14 +68,12 @@ const AddContact = () => {
     marginBottom: '20px'
   };
 
-  // Define styles for labels
   const labelStyle = {
     display: 'block',
     marginBottom: '8px',
     fontWeight: 'bold'
   };
 
-  // Define styles for input fields
   const inputStyle = {
     width: '100%',
     padding: '10px',
@@ -81,7 +82,6 @@ const AddContact = () => {
     borderRadius: '5px'
   };
 
-  // Define styles for the submit button
   const buttonStyle = {
     width: '100%',
     padding: '10px',
@@ -93,7 +93,6 @@ const AddContact = () => {
     fontWeight: 'bold'
   };
 
-  // Define styles for the link at the bottom
   const linkStyle = {
     display: 'block',
     textAlign: 'center',
@@ -102,13 +101,11 @@ const AddContact = () => {
     textDecoration: 'none'
   };
 
-  // Render the component
   return (
     <div style={elementStyle}>
-      <h1 style={h1Style}>Create Contact</h1>         {/* Form title */}
-      <form onSubmit={handleSubmit}>                  {/* Form with submit handler */}
+      <h1 style={h1Style}>Create Contact</h1>
+      <form onSubmit={handleSubmit}>
         
-        {/* Full Name Field */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>Full Name</label>
           <input
@@ -121,7 +118,6 @@ const AddContact = () => {
           />
         </div>
 
-        {/* Email Field */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>Email</label>
           <input
@@ -134,7 +130,6 @@ const AddContact = () => {
           />
         </div>
 
-        {/* Phone Field */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>Phone</label>
           <input
@@ -147,7 +142,6 @@ const AddContact = () => {
           />
         </div>
 
-        {/* Address Field */}
         <div style={{ marginBottom: '20px' }}>
           <label style={labelStyle}>Address</label>
           <input
@@ -160,15 +154,12 @@ const AddContact = () => {
           />
         </div>
 
-        {/* Submit Button */}
         <button type="submit" style={buttonStyle}>Save</button>
       </form>
 
-      {/* Link to go back */}
       <a href="#" style={linkStyle}>or get back to contacts</a>
     </div>
   );
 };
 
-// Export the component so it can be used elsewhere
 export default AddContact;
